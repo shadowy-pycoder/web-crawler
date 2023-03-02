@@ -6,10 +6,11 @@ async function main() {
         console.error('One argument (baseURL) is expected!');
         process.exit(1);
     } else {
-        console.log(`Web crawler is starting at ${process.argv[2]}`)
+        const baseURL = process.argv[2]
+        console.log(`Web crawler is starting at ${baseURL}`)
         console.log('Printing report. Please wait...')
-        const pages = await crawlPage(process.argv[2], process.argv[2])
-        printReport(pages)
+        const pages = await crawlPage(baseURL, baseURL)
+        printReport(pages, baseURL)
     }
 
 }

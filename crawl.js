@@ -40,7 +40,7 @@ function getURLsFromHTML(htmlBody, baseURL) {
 async function crawlPage(baseURL, currentURL, pages = {}) {
     const normURL = normalizeURL(currentURL)
     if (!normURL) {
-        return
+        return pages
     }
     if (normURL in pages) {
         pages[normURL] = ++pages[normURL]
@@ -58,28 +58,28 @@ async function crawlPage(baseURL, currentURL, pages = {}) {
                 headers: {
                     'content-type': 'text/html',
                 }
-
             })
             if (response.status > 399) {
                 //console.error(`Cannot download url (${currentURL}): error ${response.status} ...Skipped`)
-                return
+                return pages
             } else if (!response.headers.get('content-type').includes('text/html')) {
                 //console.error(`Invalid type of headers: ${response.headers.get('content-type')} ...Skipped`)
-                return
+                return pages
             } else {
                 pages[normURL] = 1
                 const htmlPage = await response.text()
                 const urlArray = getURLsFromHTML(htmlPage, baseURL)
                 for (let url of urlArray) {
-                    await crawlPage(baseURL, url, pages)
+                    pages = await crawlPage(baseURL, url, pages)
                 }
-                return pages
             }
         } catch (error) {
             console.error(`Something went wrong. ${error}`)
         }
 
     }
+    return pages
+
 }
 
 
